@@ -20,13 +20,17 @@
 </head>
 <body class="bg-light">
 
-    <?php if(isset($error)): ?> <p style="color: red;"><?php echo $error; ?></p> <?php endif; ?>
+    
 
     <div class="container mt-5">
 
 
         <h1 class="text-center text-primary mb-4">User Management</h1>
         
+        <?php if(isset($error)): ?> <p style="color: red;"><?php echo $error; ?></p> <?php endif; ?>
+        <?php echo validation_errors(); ?>
+
+
         <!-- Add User Button -->
         <div class="mb-4 text-end">
             <button id="openModalButton" class="btn btn-success">Add User</button>
@@ -44,7 +48,7 @@
                         <form id="userForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name:</label>
-                                <input type="text" id="name" class="form-control" placeholder="Enter name" required>
+                                <input type="text" id="name" class="form-control" placeholder="Enter name"  >
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email:</label>
@@ -154,20 +158,25 @@
             // Add User
             $('#userForm').submit(function (e) {
                 e.preventDefault();
-                const userData = {
+                $userData = {
                     name: $('#name').val(),
                     email: $('#email').val(),
                 };
-                console.log(userData);
+              
                 $.ajax({
                     url: 'Student/add_user',
                     method: 'POST',
-                    data: JSON.stringify(userData),
-                    success: function () {
-                        toastr.success('User added successfully!');
-                        $('#userModal').modal('hide');
-                        $('#userForm')[0].reset();
-                        fetchUsers();
+                    data: $userData,
+                    success: function (response) {
+                        const res = JSON.parse(response);
+                        if (res.status === 'success') {
+                            toastr.success(res.message);
+                            $('#userModal').modal('hide');
+                            $('#userForm')[0].reset();
+                            fetchUsers();
+                        } else {
+                            toastr.error(res.message);
+                        }
                     },
                     error: function () {
                         toastr.error('Error adding user.');
@@ -176,12 +185,12 @@
             });
 
             // Delete User
-            window.deleteUser = function (idl) {
+            window.deleteUser = function (id) {
                 if (confirm('Are you sure you want to delete this user?')) {
                     $.ajax({
                         url: 'Student/delete_user',
                         method: 'POST',
-                        data: { 'id': idl },
+                        data: { 'id': id },
                         success: function () {
                             toastr.success('User deleted successfully!');
                             fetchUsers();
