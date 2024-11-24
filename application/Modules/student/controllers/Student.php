@@ -28,35 +28,44 @@ class Student extends MX_Controller{
 	
 
 	public function add_user() 
-   {
-    // Get the raw POST data
-    $rawData = file_get_contents("php://input");
-    $postData = json_decode($rawData, true); // Decode JSON to array
+	{
+		
+		// Load form validation library
+		$this->load->library('form_validation');
 
-    // Validate received data
-    if (!isset($postData['name']) || !isset($postData['email'])) {
-        echo json_encode(['status' => 'error', 'message' => 'Invalid input data.']);
-        return;
-    }
+		// Set validation rules
+		$this->form_validation->set_rules('name', 'Name', 'required|min_length[5]alpha');
+		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 
-    $name = $postData['name'];
-    $email = $postData['email'];
+		
+		if ($this->form_validation->run() == True) 
+		{
+			$name = $_POST['name'];
+			$email =$_POST['email'];
 
-    // Prepare data for insertion
-    $data = [
-        'name'  => $name,
-        'email' => $email
-    ];
+			// Prepare data for insertion
+			$data = [
+				'name'  => $name,
+				'email' => $email
+			];
 
-    // Insert into database
-    $inserted = $this->student_model->add_user($data);
+			// Insert into database
+			$inserted = $this->student_model->add_user($data);
 
-    if ($inserted) {
-        echo json_encode(['status' => 'success', 'message' => 'User added successfully!', 'data' => $data]);
-    } else {
-        echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
-    }
-  }
+			if ($inserted) {
+				echo json_encode(['status' => 'success', 'message' => 'User added successfully!', 'data' => $data]);
+			} else {
+				echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
+			}
+
+		}
+		else
+		{
+			echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
+
+		}
+	}
+
 
 	
 	// public function store() {
@@ -93,7 +102,7 @@ class Student extends MX_Controller{
 
 	public function update_user() {
 		
-		try{
+		
 			
 			$id = $this->input->post('id');
 			$name = $this->input->post('name');
@@ -123,10 +132,6 @@ class Student extends MX_Controller{
 			}
 			
 
-		} catch (Exception $e)
-		{
-			echo json_encode(['status' => 'error', 'message' => 'An error occurred: ' . $e->getMessage()]); 
-		}
 	}
 
 	public function delete_user() {
