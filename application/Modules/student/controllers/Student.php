@@ -58,10 +58,12 @@ class Student extends MX_Controller{
             if ($inserted) {
                 $output= array('status' => 'success', 'message' => 'User added successfully!', 'data' => $data);
 			}
+			else{
+				throw new Exception('An unexpected error occurred.failed! store user');
+			}
 
         } else {
             
-         
             throw new Exception(validation_errors());
         }
     } 
@@ -71,7 +73,7 @@ class Student extends MX_Controller{
         log_message('error', $e->getMessage());
 
         //echo json_encode(['status' => 'error', 'message' => 'An unexpected error occurred.']);
-		
+		$output['error]'] = $e->getMessage();
 		$output['message'] = $e->getMessage();
     }
 
@@ -112,51 +114,84 @@ class Student extends MX_Controller{
 
 
 
-	public function update_user() {
-		
-		
+	public function update_user()
+	{	
+		$output= array('status' => 'error', 
+					'message' => 'please fill correct validation.');	
+			try
+			{
+				$id = $this->input->post('id');
+				$name = $this->input->post('name');
+				$email = $this->input->post('email');
 			
-			$id = $this->input->post('id');
-			$name = $this->input->post('name');
-			$email = $this->input->post('email');
+				// Load form validation library
+				$this->load->library('form_validation');
+
+				// Set validation rules
+				$this->form_validation->set_rules('name', 'Name', 'required|min_length[5]|alpha');
+				$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 		
-			if(empty($id) || empty($name) || empty($email)) 
-			{ 
-				echo json_encode(['status' => 'error', 'message' => 'All fields are required.u']);
-				 return; 
+				// Run validation
+				if ($this->form_validation->run() === TRUE)
+				{
+
+					// Prepare data for update
+					$data = [
+						'name'  => $name,
+						'email' => $email
+					];
+				
+					// Update the database
+					$updated = $this->student_model->update_user($id, $data);
+					
+					if($updated) { // Respond back with success 
+					$output= array('status' => 'success', 'message' => 'User updated successfully!');
+					} else 
+					{ 
+					throw new Exception('Failed to update user.'); 
+					}
+				}
+				else
+				{
+					throw new Exception(validation_errors());
+				}
+
 			}
+			catch (Exception $e)
+			{
+					// Log the exception and return a generic error	
+					log_message('error', $e->getMessage());
+					$output['error]'] = $e->getMessage();
+					$output['message'] = $e->getMessage();
 
-
-			// Prepare data for update
-			$data = [
-				'name'  => $name,
-				'email' => $email
-			];
-		
-			// Update the database
-			$updated = $this->student_model->update_user($id, $data);
-			
-			if($updated) { // Respond back with success 
-			echo json_encode(['status' => 'success', 'message' => 'User updated successfully!']);
-		 	} else 
-		 	{ 
-			echo json_encode(['status' => 'error', 'message' => 'Failed to update user.']); 
 			}
 			
-
+		echo json_encode($output);		
 	}
 
 	public function delete_user() {
 	
-		// Get POST data
-		$id = $this->input->post('id');
-	
-		// Delete from the database
+		try{
+			$id = $this->input->post('id');
 		
-        $deleted = $this->student_model->delete_user($id);
-	
-		// Respond back with success
-		echo json_encode(['status' => 'success', 'message' => 'User deleted successfully!']);
+			// Delete from the database
+			
+			$deleted = $this->student_model->delete_user($id);
+		
+			// Respond back with success
+			if ($deleted){
+				$output= array('status' => 'success', 'message' => 'User deleted successfully!');
+			} else {
+				throw new Exception('Failed to delete user.');
+			}
+		}catch (Exception $e) {
+
+			$output=$e->getMessage();
+
+		}
+
+		echo json_encode($output);		
+		
 	}
 	
 	
