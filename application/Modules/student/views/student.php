@@ -179,7 +179,7 @@
                         }
                     },
                     error: function () {
-                        toastr.error('Error adding user.');
+                        toastr.error(re.message);
                     }
                 });
             });
@@ -191,9 +191,15 @@
                         url: 'Student/delete_user',
                         method: 'POST',
                         data: { 'id': id },
-                        success: function () {
-                            toastr.success('User deleted successfully!');
-                            fetchUsers();
+                        success: function (output) {
+                            const res = JSON.parse(output);
+                            if(res.status === 'success'){
+                                toastr.success(res.message);
+                                fetchUsers();
+                            }
+                            else{
+                                toastr.error(res.message);
+                            }
                         },
                         error: function () {
                             toastr.error('Error deleting user.');
@@ -227,10 +233,15 @@
                     url: 'Student/update_user',
                     method: 'POST',
                     data: userData,
-                    success: function () {
-                        toastr.success('User updated successfully!');
-                        $('#editUserModal').modal('hide');
-                        fetchUsers();
+                    success: function (output) {
+                        const res = JSON.parse(output);
+                        if(res.status === 'success'){
+                            toastr.success(res.message);
+                            $('#editUserModal').modal('hide');
+                            fetchUsers();
+                        }else{
+                            toastr.error(res.message);
+                        }
                     },
                     error: function () {
                         toastr.error('Error updating user.');
