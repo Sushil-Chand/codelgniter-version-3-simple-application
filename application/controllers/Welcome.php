@@ -28,6 +28,11 @@ class Welcome extends CI_Controller {
 		$this->load->view('arrayproblem');
 	}
 
+	public function testview(){
+		
+		$this->load->view('testview');
+	}
+
 
 
 	public function sequence(){

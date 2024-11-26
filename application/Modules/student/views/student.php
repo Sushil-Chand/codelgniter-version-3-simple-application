@@ -167,8 +167,8 @@
                     url: 'Student/add_user',
                     method: 'POST',
                     data: $userData,
-                    success: function (response) {
-                        const res = JSON.parse(response);
+                    success: function (output) {
+                        const res = JSON.parse(output);
                         if (res.status === 'success') {
                             toastr.success(res.message);
                             $('#userModal').modal('hide');

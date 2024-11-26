@@ -28,43 +28,55 @@ class Student extends MX_Controller{
 	
 
 	public function add_user() 
-	{
-		
-		// Load form validation library
-		$this->load->library('form_validation');
+{
+	$output= array('status' => 'error', 
+					'message' => 'please fill correct validation.');
 
-		// Set validation rules
-		$this->form_validation->set_rules('name', 'Name', 'required|min_length[5]alpha');
-		$this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+    try {
+        // Load form validation library
+        $this->load->library('form_validation');
 
-		
-		if ($this->form_validation->run() == True) 
-		{
-			$name = $_POST['name'];
-			$email =$_POST['email'];
+        // Set validation rules
+        $this->form_validation->set_rules('name', 'Name', 'required|min_length[5]|alpha');
+        $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
 
-			// Prepare data for insertion
-			$data = [
-				'name'  => $name,
-				'email' => $email
-			];
+        // Run validation
+        if ($this->form_validation->run() === TRUE) {
+            // Retrieve sanitized input
+            $name = $this->input->post('name');
+            $email = $this->input->post('email');
 
-			// Insert into database
-			$inserted = $this->student_model->add_user($data);
+            // Prepare data for insertion
+            $data = [
+                'name'  => $name,
+                'email' => $email
+            ];
 
-			if ($inserted) {
-				echo json_encode(['status' => 'success', 'message' => 'User added successfully!', 'data' => $data]);
-			} else {
-				echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
+            // Insert into database
+            $inserted = $this->student_model->add_user($data);
+
+            if ($inserted) {
+                $output= array('status' => 'success', 'message' => 'User added successfully!', 'data' => $data);
 			}
 
-		}
-		else
-		{
-			echo json_encode(['status' => 'error', 'message' => 'Failed to add user.']);
+        } else {
+            
+         
+            throw new Exception(validation_errors());
+        }
+    } 
+	catch (Exception $e) 
+	{
+        // Log the exception and return a generic error
+        log_message('error', $e->getMessage());
 
-		}
-	}
+        //echo json_encode(['status' => 'error', 'message' => 'An unexpected error occurred.']);
+		
+		$output['message'] = $e->getMessage();
+    }
+
+	echo json_encode($output);
+}
 
 
 	

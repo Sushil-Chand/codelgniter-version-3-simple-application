@@ -21,6 +21,8 @@ class student_model extends CI_Model {
     public function add_user($data) {
         // Insert the data into the database
         return $this->db->insert('users', $data);
+
+        
     }
 
     // public function store($data) {
