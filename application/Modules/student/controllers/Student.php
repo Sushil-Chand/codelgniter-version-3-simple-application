@@ -227,15 +227,18 @@ class Student extends MX_Controller{
 		$originalDate = $birthdayDate->format('y-m-d');
 		
 		
-		$newDate = date("d-m-Y", strtotime($originalDate));
+		$newDate = date("l jS- F Y", strtotime(	$originalDate));
 		
+	
+		
+
+
         $birthdayDate->setDate($today->format('Y')+1, $birthdayDate->format('m'), $birthdayDate->format('d'));
         
 	
-		
-        
 
         $daysUntilBirthday = $today->diff($birthdayDate)->days;
+		$daysUntilBirthday = $daysUntilBirthday +1;
 
 		
 

@@ -106,7 +106,6 @@ function longestUniqueSubstr($s) {
     $n = strlen($s);
     $res = 0;
 
-    // Iterate through the string
     for ($i = 0; $i < $n; $i++) {
         // Initialize all characters as not visited
         $visited = array_fill(0, 256, false);
@@ -116,8 +115,7 @@ function longestUniqueSubstr($s) {
             if ($visited[ord($s[$j])] === true) {
                 break;
             } else {
-                // Else update the result if this window is larger,
-                // and mark the current character as visited
+                
                 $res = max($res, $j - $i + 1);
                 $visited[ord($s[$j])] = true;
             }
@@ -126,7 +124,7 @@ function longestUniqueSubstr($s) {
     return $res;
 }
 
-$s = "geeksforgeeks";
+$s = "geeksforgeeksAA";
 echo longestUniqueSubstr($s);
 ?>
 
