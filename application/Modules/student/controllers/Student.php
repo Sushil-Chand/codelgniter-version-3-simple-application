@@ -12,9 +12,12 @@ class Student extends MX_Controller{
 
     public function index()
 	{
-	
-		$users = $this->student_model->get_all_users();
-        $this->load->view('student',$users);
+		
+		$usertype=$this->student_model->get_usertype();
+
+		
+        $this->load->view('student', $usertype);
+
     }
 
 	
@@ -22,13 +25,18 @@ class Student extends MX_Controller{
 
     
 	public function get_users() {
-        $users = $this->student_model->get_all_users();
+        $users =$this-> birthdaycount();
+		
         echo json_encode($users);
     }
 	
 
 	public function add_user() 
-{
+   {	
+		
+
+		
+
 	$output= array('status' => 'error', 
 					'message' => 'please fill correct validation.');
 
@@ -39,6 +47,8 @@ class Student extends MX_Controller{
         // Set validation rules
         $this->form_validation->set_rules('name', 'Name', 'required|min_length[5]|alpha');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
+	
+
 
         // Run validation
         if ($this->form_validation->run() === TRUE) {
@@ -50,6 +60,7 @@ class Student extends MX_Controller{
             $data = [
                 'name'  => $name,
                 'email' => $email
+				
             ];
 
             // Insert into database
@@ -73,7 +84,7 @@ class Student extends MX_Controller{
         log_message('error', $e->getMessage());
 
         //echo json_encode(['status' => 'error', 'message' => 'An unexpected error occurred.']);
-		$output['error]'] = $e->getMessage();
+		$output['status'] = 'error';	
 		$output['message'] = $e->getMessage();
     }
 
@@ -161,7 +172,7 @@ class Student extends MX_Controller{
 			{
 					// Log the exception and return a generic error	
 					log_message('error', $e->getMessage());
-					$output['error]'] = $e->getMessage();
+					$output['status]'] = 'error';
 					$output['message'] = $e->getMessage();
 
 			}
@@ -193,8 +204,66 @@ class Student extends MX_Controller{
 		echo json_encode($output);		
 		
 	}
+
+
+	public function birthdaycount(){
+
+		$users = $this->student_model->get_all_users();
+
+		$result = [];
+    
+    // Loop through each student to calculate days until the next birthday
+    foreach ($users as $student) {
+        $dob = $student['dob']; //
+
+		
+        $birthdayDate = new DateTime($dob);
+		
+        $today = new DateTime();
+
+		
+
+		
+		$originalDate = $birthdayDate->format('y-m-d');
+		
+		
+		$newDate = date("d-m-Y", strtotime($originalDate));
+		
+        $birthdayDate->setDate($today->format('Y')+1, $birthdayDate->format('m'), $birthdayDate->format('d'));
+        
+	
+		
+        
+
+        $daysUntilBirthday = $today->diff($birthdayDate)->days;
+
+		
+
+		$result[] = [
+            'name' => $student['name'],
+            'email' => $student['email'],
+            'dob' => $student['dob'],
+			'Category' => $student['Category'],
+			'status' => $student['status'],
+			'upcoming_day_count' => $student['upcoming_day_count'],
+            'days_until_birthday' => $daysUntilBirthday,
+			'newDate' => $newDate
+        ];
+
+       
+    }
+
+   
+
+		return $result;
+		
+
+
+	}
 	
 	
 	
 }
+
+
 

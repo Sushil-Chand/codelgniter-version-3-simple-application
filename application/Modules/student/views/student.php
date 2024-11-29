@@ -20,7 +20,7 @@
 </head>
 <body class="bg-light">
 
-    
+  
 
     <div class="container mt-5">
 
@@ -29,14 +29,14 @@
         
         <?php if(isset($error)): ?> <p style="color: red;"><?php echo $error; ?></p> <?php endif; ?>
         <?php echo validation_errors(); ?>
-
+      
 
         <!-- Add User Button -->
         <div class="mb-4 text-end">
             <button id="openModalButton" class="btn btn-success">Add User</button>
         </div>
 
-        <!-- Add User Modal -->
+                <!-- Add User Modal -->
         <div class="modal fade" id="userModal" tabindex="-1" aria-labelledby="userModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -48,18 +48,48 @@
                         <form id="userForm">
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name:</label>
-                                <input type="text" id="name" class="form-control" placeholder="Enter name"  >
+                                <input type="text" id="name" class="form-control" placeholder="Enter name" required>
                             </div>
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email:</label>
                                 <input type="email" id="email" class="form-control" placeholder="Enter email" required>
                             </div>
-                            <button type="submit" class="btn btn-primary w-100">Submit</button>
+                            <div class="mb-3">
+                                <label for="dob" class="form-label">Date of Birth:</label>
+                                <input type="date" id="dob" class="form-control" required>
+                            </div>
+                            <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="status" class="form-label">Status:</label>
+                                <select id="status" class="form-select w-30" required>
+                                    <option value="" disabled selected>Select status</option>
+                                    <option value="active">Active</option>
+                                    <option value="inactive">Inactive</option>
+                                    <option value="delete">Delete</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="users_id" class="form-label">User Type:</label>
+                                <select id="users_id" name="users_id" class="form-select">
+                                    <option value="" disabled selected>Select user type</option>
+                                    <?php foreach ($usertype as $user_type): ?>
+                                        <option value="<?= $user_type['user_id']; ?>">
+                                            <?= $user_type['category']; ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </div>
+
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <button type="submit" class="btn btn-primary">Submit</button>
+                        </div>
                         </form>
                     </div>
                 </div>
             </div>
         </div>
+
 
         <!-- Edit User Modal -->
         <div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
@@ -99,6 +129,12 @@
                         <th>SN</th>
                         <th>Name</th>
                         <th>Email</th>
+                        <th>UserCategory</th>
+                        <th>DOB</th>
+                        <th>upcoming birthday(sql)</th>
+                        <th>days until birthday(php)</th>
+                        <th>newdate</th>
+                        <th>Status</th> 
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -128,6 +164,12 @@
                                         <td class="text-center">${sn++}</td>
                                         <td>${user.name}</td>
                                         <td>${user.email}</td>
+                                        <td>${user.Category}</td>
+                                        <td>${user.dob}</td>
+                                        <td>${user.upcoming_day_count}</td>
+                                        <td>${user.days_until_birthday}</td>
+                                        <td>${user.newDate}</td>
+                                        <td>${user.status}</td>
                                         <td class="text-center">
                                             <button class="btn btn-warning btn-sm editBtn" 
                                                 data-id="${user.id}" data-name="${user.name}" 
@@ -155,12 +197,16 @@
                 $('#userModal').modal('show');
             });
 
-            // Add User
-            $('#userForm').submit(function (e) {
-                e.preventDefault();
-                $userData = {
-                    name: $('#name').val(),
-                    email: $('#email').val(),
+                // Add User
+                $('#userForm').submit(function (e) {
+                    e.preventDefault();
+                    $userData = {
+                        name: $('#name').val(),
+                        email: $('#email').val(),
+                        dob: $('#dob').val(),
+                        status: $('#status').val(),
+                        users_id:$('#users_id').val()  
+                    
                 };
               
                 $.ajax({
@@ -168,6 +214,21 @@
                     method: 'POST',
                     data: $userData,
                     success: function (output) {
+
+
+                        const userTypes = JSON.parse($userType); 
+
+                         const $usersIdSelect = $('#users_id');
+
+                        $usersIdSelect.empty();
+
+                        // Add default placeholder option
+                        $usersIdSelect.append('<option value="" disabled selected>Select user type</option>');
+
+                        // Populate dropdown with fetched user types
+                        userTypes.forEach(userType => {
+                            $usersIdSelect.append(`<option value="${userType.user_id}">${userType.category}</option>`);
+            });
                         const res = JSON.parse(output);
                         if (res.status === 'success') {
                             toastr.success(res.message);

@@ -79,21 +79,62 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 <body>
 
 <div id="container">
-	<h1>Welcome to CodeIgniter!</h1>
+	<h1>I am decode here</h1>
+<?php
 
-	<div id="body">
-		<p>The page you are looking at is being generated dynamically by CodeIgniter.</p>
+#string unquie char count()
+// $str = "GEEKSFORGEEKS";
 
-		<p>If you would like to edit this page you'll find it located at:</p>
-		<code>application/views/welcome_message.php</code>
+// $result=[];
+// $count=0;
+// for ($i=0; $i < strlen($str); $i++) { 
 
-		<p>The corresponding controller for this page is found at:</p>
-		<code>application/controllers/Welcome.php</code>
+// 	if (!in_array($str[$i], $result)) {
+// 		$result[] = $str[$i];
+// 		$count++;
+// 	}
+// }
+// echo $count;
 
-		<p>If you are exploring CodeIgniter for the very first time, you should start by reading the <a href="userguide3/">User Guide</a>.</p>
-	</div>
+#length of the longest substring without repeating characters. 
 
-	<p class="footer">Page rendered in <strong>{elapsed_time}</strong> seconds. <?php echo  (ENVIRONMENT === 'development') ?  'CodeIgniter Version <strong>' . CI_VERSION . '</strong>' : '' ?></p>
+$str = "GEEKSFORGEEKSA";
+
+
+
+function longestUniqueSubstr($s) {
+    $n = strlen($s);
+    $res = 0;
+
+    // Iterate through the string
+    for ($i = 0; $i < $n; $i++) {
+        // Initialize all characters as not visited
+        $visited = array_fill(0, 256, false);
+
+        for ($j = $i; $j < $n; $j++) {
+            // If the current character is already visited, break the loop
+            if ($visited[ord($s[$j])] === true) {
+                break;
+            } else {
+                // Else update the result if this window is larger,
+                // and mark the current character as visited
+                $res = max($res, $j - $i + 1);
+                $visited[ord($s[$j])] = true;
+            }
+        }
+    }
+    return $res;
+}
+
+$s = "geeksforgeeks";
+echo longestUniqueSubstr($s);
+?>
+
+
+
+
+
+
 </div>
 
 </body>

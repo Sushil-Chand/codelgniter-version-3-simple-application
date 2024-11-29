@@ -12,9 +12,45 @@ class student_model extends CI_Model {
 
     public function get_all_users() 
     {
-        $users = $this->db->get('users')->result_array();
         
-        return $users;
+        
+
+
+        $sql="SELECT 
+            users.name, 
+            users.email, 
+            users.dob, 
+            usertypes.Category, 
+            users.status,
+            DATEDIFF(
+                CASE 
+                    WHEN DATE_FORMAT(users.dob, '%m-%d') >= DATE_FORMAT(CURDATE(), '%m-%d') 
+                    THEN CONCAT(YEAR(CURDATE()), '-', DATE_FORMAT(users.dob, '%m-%d'))
+                    ELSE CONCAT(YEAR(CURDATE()) + 1, '-', DATE_FORMAT(users.dob, '%m-%d'))
+                END, 
+                CURDATE()
+            ) AS upcoming_day_count
+        FROM 
+            users 
+        JOIN 
+            usertypes 
+        ON 
+            users.users_id = usertypes.User_id";
+            
+                $query = $this->db->query($sql);
+                
+                $users = $query->result_array(); 
+                return $users;
+            }
+
+
+    public function get_usertype(){
+
+        $sql="select Category from usertypes";
+        $query = $this->db->query($sql);
+        $usertype = $query->result_array();
+
+        return $usertype;
     }
 
 
