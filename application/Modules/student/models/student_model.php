@@ -1,22 +1,21 @@
 <?php
-defined('BASEPATH') OR exit('No direct script access allowed');
+defined('BASEPATH') or exit('No direct script access allowed');
 
-class student_model extends CI_Model {
+class student_model extends CI_Model
+{
 
-    public function __construct() 
+    public function __construct()
     {
-         parent::__construct();
-         $this->load->database();
-         
-         }
+        parent::__construct();
+        $this->load->database();
 
-    public function get_all_users() 
+    }
+
+    public function get_all_users()
     {
-        
-        
 
-
-        $sql="SELECT 
+        $sql = "SELECT
+            users.id, 
             users.name, 
             users.email, 
             users.dob, 
@@ -36,43 +35,65 @@ class student_model extends CI_Model {
             usertypes 
         ON 
             users.users_id = usertypes.User_id";
-            
-                $query = $this->db->query($sql);
-                
-                $users = $query->result_array(); 
-                return $users;
-            }
 
-
-    public function get_usertype(){
-
-        $sql="select Category from usertypes";
         $query = $this->db->query($sql);
-        $usertype = $query->result_array();
 
-        return $usertype;
+        $users = $query->result_array();
+        return $users;
     }
 
 
-    public function add_user($data) {
+    public function Usertype()
+    {
+
+
+        $search = $this->input->post('searchTerm');
+
+        $this->db->select('*');
+        $this->db->from('usertypes');
+
+        //Apply search filter if search term is provided
+        if (!empty($search)) {
+            $this->db->group_start(); // Group WHERE conditions for OR clause
+            $this->db->like('Category', $search);
+            $this->db->or_like('User_id', $search);
+            $this->db->group_end();
+        }
+
+        $query = $this->db->get();
+
+        // Return the filtered data as JSON
+        return ($query->result());
+
+    }
+
+
+    public function add_user($data)
+    {
         // Insert the data into the database
         return $this->db->insert('users', $data);
 
-        
+
     }
 
-    // public function store($data) {
-    //     // Insert data into the users table
-    //     return $this->db->insert('users', $data);
-    // }
+    public function store($data)
+    {
+        // Insert data into the users table
+        return $this->db->insert('users', $data);
+    }
 
-    public function update_user($id, $data) {
+    public function update_user($id, $data)
+    {
+
+
         // Update user details by ID
         $this->db->where('id', $id);
         return $this->db->update('users', $data);
     }
 
-    public function delete_user($id) {
+    public function delete_user($id)
+    {
+
         // Delete a user by ID
         $this->db->where('id', $id);
         return $this->db->delete('users');
