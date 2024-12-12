@@ -8,19 +8,64 @@ class student_model extends CI_Model
     {
         parent::__construct();
         $this->load->database();
+        $this->load->library('upload');
 
     }
 
     public function get_all_users()
     {
+        $search_data = $this->input->post('search');
 
+		$search_value = $search_data['value'];
+
+        // order by column name asc
+
+       
+        
+        
+        $sort_the_column= $this->input->post('order');
+        $sort_column = $sort_the_column['0']['column'];
+
+       
+        $sort_column_dir= $sort_the_column['0']['dir'];
+        
+        // order by $column_name $sort_column_dir
+
+        $column_data = $this->input->post('columns');
+        $column_name = $column_data[$sort_column]['data'];
+
+        
+
+        if(!empty($search_value))
+        {
+            $search_condition = "where name like '%$search_value%' or email like '%$search_value%' or dob like '%$search_value%' or status like '%$search_value%'or user_id like '%$search_value'";
+        }
+        else{
+            $search_condition = "";
+        }
+
+
+        if(!empty($column_name!='sn'))
+        {
+            
+            $order_by_sql = "order by  $column_name $sort_column_dir";
+        }
+        else{
+           
+            $order_by_sql= '';
+        }
+        
         $sql = "SELECT
             users.id, 
-            users.name, 
-            users.email, 
-            users.dob, 
-            usertypes.Category, 
-            users.status,
+            users.name as name, 
+            users.email as email, 
+            users.dob as dob,
+            usertypes.Category as category,
+
+         
+            usertypes.User_id as users_id, 
+            users.status as status,
+            users.profile_pic,
             DATEDIFF(
                 CASE 
                     WHEN DATE_FORMAT(users.dob, '%m-%d') >= DATE_FORMAT(CURDATE(), '%m-%d') 
@@ -34,9 +79,19 @@ class student_model extends CI_Model
         JOIN 
             usertypes 
         ON 
-            users.users_id = usertypes.User_id";
+            users.users_id = usertypes.User_id $search_condition
+        
+         $order_by_sql  ";
 
+
+
+       
         $query = $this->db->query($sql);
+
+        
+
+
+        
 
         $users = $query->result_array();
         return $users;
@@ -56,7 +111,7 @@ class student_model extends CI_Model
         if (!empty($search)) {
             $this->db->group_start(); // Group WHERE conditions for OR clause
             $this->db->like('Category', $search);
-            $this->db->or_like('User_id', $search);
+            // $this->db->or_like('User_id', $search);
             $this->db->group_end();
         }
 
@@ -98,4 +153,22 @@ class student_model extends CI_Model
         $this->db->where('id', $id);
         return $this->db->delete('users');
     }
+
+    public function get_users_by_id($id){
+        $this->db->select('profile_pic');
+        $this->db->from('users');
+        $this->db->where('id',$id);
+        $query =$this->db->get();
+
+        $curr_img = $query->row_array();
+
+         return  $curr_img['profile_pic'];     
+    }
+
+
+
+    
+
+
+   
 }

@@ -10,7 +10,6 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
     <!-- Toastr for Notifications -->
@@ -20,19 +19,51 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/css/select2.min.css" rel="stylesheet" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/select2/4.0.6-rc.0/js/select2.min.js"></script>
+
+    <link href="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.css" rel="stylesheet">
+    <script src="https://cdn.datatables.net/v/dt/dt-2.1.8/datatables.min.js"></script>
+
+    <!-- CSS for DataTables -->
+    <!-- <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/jquery.dataTables.min.css"> -->
+
+    <!-- <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"> </script> -->
+
+
+    <!-- 
+    <link rel="stylesheet" href="https://cdn.datatables.net/1.11.5/css/jquery.dataTables.min.css">
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script> -->
+
+
+
+    <style>
+    #image_preview {
+        width: 100px;
+        /* Adjust the width as needed */
+        height: 100px;
+        /* Adjust the height as needed */
+        border: 1px solid #ddd;
+        /* Optional border for the image box */
+        border-radius: 5px;
+        /* Optional rounded corners */
+        object-fit: cover;
+        /* Maintain aspect ratio */
+    }
+    </style>
+
+
+
 </head>
 
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center text-primary mb-4">User Management</h1>
         <?php if (isset($error)): ?>
-            <p style="color: red;"><?php echo $error; ?></p><?php endif; ?>
+        <p style="color: red;"><?php echo $error; ?></p><?php endif; ?>
         <?php echo validation_errors(); ?>
 
+
         <!-- Add User Button -->
-        <div class="mb-4 text-end">
-            <button id="openModalButton" class="btn btn-success">Add User</button>
-        </div>
+
         <div class="modal fade" id="userModal" aria-labelledby="userModalLabel" aria-hidden="false">
             <div class="modal-dialog modal-lg">
                 <!-- Adjusted to a larger, rectangular layout -->
@@ -41,51 +72,77 @@
                         <h5 class="modal-title" id="userModalLabel">Add User</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
-                    <div class="modal-body" style="max-height: 800px; padding: 20px;">
-                        <form id="userForm">
+                    <div class="modal-body" style="max-height: 500px; padding: 15px;">
+                        <form id="userForm" action="<?php echo base_url('Student/store_student');?>" method="POST"
+                            enctype="multipart/form-data">
+
+                            <div class="mb-3">
+                                <label for="profile_pic" class="form-label">Images</label>
+                                <input type="file" id="profile_pic" name="profile_pic" class="form-control">
+                                <div class="mt-3">
+                                    <img id="image_preview" src="#" alt="Image Preview" class="img-thumbnail d-none" />
+                                </div>
+                            </div>
+
+
                             <!-- Name Input -->
                             <div class="mb-3">
                                 <label for="name" class="form-label">Name:</label>
-                                <input type="text" id="name" class="form-control" placeholder="Enter name" required>
+                                <input type="text" id="name" name="name" class="form-control" placeholder="Enter name">
                             </div>
 
                             <!-- Email Input -->
                             <div class="mb-3">
                                 <label for="email" class="form-label">Email:</label>
-                                <input type="email" id="email" class="form-control" placeholder="Enter email" required>
+                                <input type="email" id="email" name="email" class="form-control"
+                                    placeholder="Enter email">
                             </div>
 
                             <!-- Date of Birth -->
                             <div class="mb-3">
                                 <label for="dob" class="form-label">Date of Birth:</label>
-                                <input type="date" id="dob" class="form-control" required>
+                                <input type="date" id="dob" name="dob" class="form-control">
                             </div>
 
-                            <!-- Status Dropdown -->
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status:</label>
-                                <select id="status" class="form-select" required>
-                                    <option value="" disabled selected>Select status</option>
-                                    <option value="active">Active</option>
-                                    <option value="inactive">Inactive</option>
-                                    <option value="delete">Delete</option>
-                                </select>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="province" class="form-label">Province</label>
+                                        <input id="province" name="province" class="form-control">
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="district" class="form-label">District</label>
+                                        <input id="district" name="district" class="form-control">
+                                    </div>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <div class="mb-3">
+                                        <label for="status" class="form-label">Status</label>
+                                        <select id="status" name="status" class="form-select">
+                                            <option value="" disabled selected>Select status</option>
+                                            <option value="active">Active</option>
+                                            <option value="inactive">Inactive</option>
+                                            <option value="delete">Delete</option>
+                                        </select>
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Category Dropdown -->
-                            <div class="mb-3">
-                                <label for="users_id" class="form-label">Category:</label>
-                                <select name="users_id" id="users_id" class="js-example-basic-single">
-                                    <option value="" selected>Select Category</option>
-                                </select>
-
-
+                            <div class="row mb-3">
+                                <div class="col-md-8">
+                                    <label for="users_id" class="form-label">Category:</label>
+                                    <select name="users_id" id="users_id" class="js-example-basic-single form-select">
+                                        <option value="" selected>Select Category</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-4 d-flex align-items-end">
+                                    <button type="submit" class="btn btn-primary w-100">ADD</button>
+                                </div>
                             </div>
 
-                            <!-- Submit Button -->
-                            <div class="d-flex justify-content-end">
-                                <button type="submit" class="btn btn-primary">Submit</button>
-                            </div>
                         </form>
                     </div>
                 </div>
@@ -104,42 +161,52 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form id="editUserForm">
+                        <form id="editUserForm" action="<?php echo base_url('Student/update_user');?>" method="POST"
+                            enctype="multipart/form-data">
                             <!-- Hidden Input for User ID -->
                             <input type="hidden" id="modalUserId" name="id">
+
+                            <div class="mb-3">
+                                <label for="currentProfilePic" class="form-label">Profile Picture:</label>
+                                <img id="currentProfilePic" name="currentProfilePic"
+                                    src="base_url( 'Images/'. profile_pic" alt="Current Profile Picture"
+                                    style="width: 80px; height: 100px; border-radius: 20%; object-fit: cover;">
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="changeImage" class="form-label">CLick Here</label>
+                                <input type=file id="changeimage" name="changeimage">
+                            </div>
 
                             <!-- Name Field -->
                             <div class="mb-3">
                                 <label for="modalUserName" class="form-label">Name</label>
-                                <input type="text" id="modalUserName" class="form-control" placeholder="Enter name"
-                                    required>
+                                <input type="text" id="modalUserName" name="modalUserName" class="form-control"
+                                    placeholder="Enter name" required>
                             </div>
 
                             <!-- Email Field -->
                             <div class="mb-3">
                                 <label for="modalUserEmail" class="form-label">Email</label>
-                                <input type="email" id="modalUserEmail" class="form-control" placeholder="Enter email"
-                                    required>
+                                <input type="email" id="modalUserEmail" name="modalUserEmail" class="form-control"
+                                    placeholder="Enter email" required>
                             </div>
 
                             <!-- Date of Birth Field -->
                             <div class="mb-3">
                                 <label for="modalUserDob" class="form-label">Date of Birth</label>
-                                <input type="date" id="modalUserDob" class="form-control">
+                                <input type="date" id="modalUserDob" name="modalUserDob" class="form-control">
                             </div>
 
 
                             <div class="mb-3"> <label for="modalUserStatus" class="form-label">Status:</label>
-                                <select id="modalUserStatus" class="form-select" required>
+                                <select id="modalUserStatus" name="modalUserStatus" class="form-select" required>
                                     <option value="" disabled selected>Select status</option>
                                     <option value="active">Active</option>
                                     <option value="inactive">Inactive</option>
                                     <option value="delete">Delete</option>
                                 </select>
                             </div>
-
-
-
 
                             <div class="mb-3">
                                 <label for="modalUsersId" class="form-label">Category:</label>
@@ -149,9 +216,10 @@
                                 </select>
                             </div>
 
+
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-success">Update</button>
+                                <button type="submit" class="btn btn-primary" value="upload">Update</button>
                             </div>
                         </form>
                     </div>
@@ -159,287 +227,412 @@
             </div>
         </div>
 
-        <!-- Users List -->
-        <h2 class="text-secondary">Users List</h2>
-        <div class="table-responsive">
-            <table class="table table-bordered table-striped align-middle" id="usersTable">
-                <thead class="table-primary text-center">
+
+
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-12">
+                    Users List
+                    <h2 class="text-secondary">Users List</h2>
+                    <div class="card">
+                        <div class="">
+                            <button class="btn btn-primary px-4 m-2 float-right" id="openModalButton">Add</button>
+                        </div>
+                        <div class="card-body table-responsive p-2 table-container">
+                            <table class="table table-hover table-bordered display compact" id="usersTable">
+                                <thead>
+                                    <tr>
+                                        <th>SN</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>UserCategory</th>
+                                        <th>DOB</th>
+                                        <th>upcoming birthday(sql)</th>
+                                        <th>days until birthday(php)</th>
+                                        <th>newdate</th>
+                                        <th>Status</th>
+                                        <th>profile_pic</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="container">
+            <h1>Upcoming Birthdays</h1>
+            <table id="birthdayTable" class="display">
+                <thead>
                     <tr>
-                        <th>SN</th>
+                        <th>ID</th>
                         <th>Name</th>
                         <th>Email</th>
-                        <th>UserCategory</th>
-                        <th>DOB</th>
-                        <th>upcoming birthday(sql)</th>
-                        <th>days until birthday(php)</th>
-                        <th>newdate</th>
+                        <th>Date of Birth</th>
+                        <th>Category</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th>Upcoming Day Count</th>
+                        <th>Days Until Birthday</th>
+                        <th>Next Birthday</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <!-- Data will be dynamically loaded here -->
-                </tbody>
-            </table>
-        </div>
-    </div>
+                    < Data will be populated here by DataTables -->
+    <!-- </tbody>
+    </table>
+    </div> -->
+
 
     <script>
-        $(document).ready(function () {
-            // Fetch and display users
-            function fetchUsers() {
-                $.ajax({
-                    url: 'Student/getData',
-                    method: 'GET',
-                    success: function (response) {
+    $(document).ready(function() {
+        //Fetch and display users
 
-                        const users = JSON.parse(response);
-                        let rows = '';
-                        let sn = 1;
+        // function fetchUsers() {
+        //     $.ajax({
+        //         url: 'Student/getData',
+        //         method: 'GET',
+        //         success: function(response) {
 
-                        if (users.length > 0) {
-                            users.forEach(user => {
-                                rows += `
-                            <tr>
-                            <td class="text-center">${sn++}</td>
-                            <td>${user.name}</td>
-                            <td>${user.email}</td>
-                            <td>${user.Category}</td>
-                            <td>${user.dob}</td>
-                            <td>${user.upcoming_day_count}</td>
-                            <td>${user.days_until_birthday}</td>
-                            <td>${user.newDate}</td>
-                            <td>${user.status}</td>
-                            <td class="text-center">
-                            <button class="btn btn-warning btn-sm editBtn" 
-                            data-id="${user.id}" data-name="${user.name}" 
-                            data-email="${user.email}" data-dob="${user.dob}" data-status="${user.status}" data-users_id="${user.Category}"s>
-                            Edit
-                            </button>
-                            <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
-                            </td>
-                            </tr>`;
-                            });
-                        } else {
-                            rows = `<tr><td colspan="4" class="text-center">No users found.</td></tr>`;
-                        }
+        //             const users = JSON.parse(response);
+        //             let rows = '';
+        //             let sn = 1;
 
-                        $('#usersTable tbody').html(rows);
-                    },
-                    error: function () {
-                        toastr.error('Error fetching users.');
-                    }
-                });
-            }
+        //             if (users.length > 0) {
+        //                 users.forEach(user => {
+        //                     rows += `
+        //                     <tr>
+        //                     <td class="text-center">${sn++}</td>
+        //                     <td>${user.name}</td>
+        //                     <td>${user.email}</td>
+        //                     <td>${user.Category}</td>
+        //                     <td>${user.dob}</td>
+        //                     <td>${user.upcoming_day_count}</td>
+        //                     <td>${user.days_until_birthday}</td>
+        //                     <td>${user.newDate}</td>
+        //                     <td>${user.status}</td>
+        //                     <td class="text-center">
+        //                     <button class="btn btn-warning btn-sm editBtn" 
+        //                     data-id="${user.id}" data-name="${user.name}" 
+        //                     data-email="${user.email}" data-dob="${user.dob}" data-status="${user.status}" data-users_id="${user.Category}"s>
+        //                     Edit
+        //                     </button>
+        //                     <button class="btn btn-danger btn-sm" onclick="deleteUser(${user.id})">Delete</button>
+        //                     </td>
+        //                     </tr>`;
+        //                 });
+        //             } else {
+        //                 rows =
+        //                     `<tr><td colspan="4" class="text-center">No users found.</td></tr>`;
+        //             }
 
-            // Open Add User Modal
-            $('#openModalButton').click(function () {
-                $('#userModal').modal('show');
-
-                $('#users_id').select2({
-                    dropdownParent: $('#userModal'),
-                    tags: true,
-                    allowClear: true,
-                    width: '50%',
-                    height: '34px',
-
-                    ajax: {
-                        url: 'http://localhost:8000/Student/usertype',
-                        type: 'POST',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            return {
-                                searchTerm: params.term
-                            };
-                        },
-                        processResults: function (data) {
-                            return {
-                                results: data.map(function (usertype) {
-                                    return {
-                                        id: usertype.User_id,
-                                        text: usertype.Category
-                                    };
-                                })
-                            };
-                        },
-                        cache: true
-                    },
-                    minimumInputLength: 1,
-                });
-            });
-
-            $('#userForm').submit(function (e) {
-                e.preventDefault();
-                $userData = {
-                    name: $('#name').val(),
-                    email: $('#email').val(),
-                    dob: $('#dob').val(),
-                    status: $('#status').val(),
-                    users_id: $('#users_id').val()
-                };
-                $.ajax({
-
-                    url: 'Student/add_user',
-                    method: 'POST',
-                    data: $userData,
-                    success: function (output) {
-                        const res = JSON.parse(output);
-                        if (res.status === 'success') {
-                            toastr.success(res.message);
-                            $('#userModal').modal('hide');
-                            $('#userForm')[0].reset();
-                            fetchUsers();
-                        } else {
-                            toastr.error(res.message);
-                        }
-                    },
-                    error: function () {
-                        toastr.error(re.message);
-                    }
-                });
-            });
-
-            // Edit User
-            $(document).on('click', '.editBtn', function () {
-                const id = $(this).data('id');
-                const name = $(this).data('name');
-                const email = $(this).data('email');
-                const dob = $(this).data('dob');
-                const status = $(this).data('status');
-                const users_id = $(this).data('users_id');
+        //             $('#usersTable tbody').html(rows);
+        //         },
+        //         error: function() {
+        //             toastr.error('Error fetching users.');
+        //         }
+        //     });
+        // }
 
 
-                // Populate modal fields
-                $('#modalUserId').val(id);
-                $('#modalUserName').val(name);
-                $('#modalUserEmail').val(email);
-                $('#modalUserDob').val(dob);
+        var usersTable = $('#usersTable').DataTable({
+            destroy: true,
+            processing: true,
+            language: {
+                processing: '<span style="color:black;">Processing...</span>'
 
-                const normalizedStatus = status.toLowerCase(); // Normalize the status value
-
-                // Check if the status value exists in the dropdown
-                if ($('#modalUserStatus option[value="' + normalizedStatus + '"]').length) {
-                    $('#modalUserStatus').val(normalizedStatus).change(); // Set status to selected value
-                } else {
-                    console.error('Status value not found in dropdown:', status);
-                }
-
-                $('#modalUsersId').val(users_id);
-                $('#editUserModal').modal('show');
-
-                // Initialize Select2
-                const selectElement = $('.js-example-basic-category');
-                selectElement.select2({
-                    dropdownParent: $('#editUserModal'),
-                    placeholder: 'select an option',
-                    width: '50%',
-                    ajax: {
-                        url: 'http://localhost:8000/Student/usertype',
-                        type: 'POST',
-                        dataType: 'json',
-                        delay: 250,
-                        data: function (params) {
-                            return {
-                                searchTerm: params.term
-                            };
-                        },
-                        processResults: function (data) {
-                            return {
-                                results: data.map(function (usertype) {
-                                    console.log(usertype);
-                                    return {
-
-                                        id: usertype.User_id,
-                                        text: usertype.Category
-                                    };
-                                })
-                            };
-                        },
-                        cache: true
-                    },
-                    minimumInputLength: 1,
-                });
-
-                // Set the selected option for Select2
-                const selectedOption = {
-
-                    id: id,
-                    text: users_id,
-
-                }; // Use data attribute or fallback
-                if (selectedOption.id) {
-                    const option = new Option(selectedOption.text, selectedOption.id, true, true);
-                    selectElement.append(option).trigger('change'); // Add and set the option
-                }
-            });
+            },
+            columnDefs: [{
+                "targets": [0, 6, 7, 9],
+                "orderable": false
+            }],
 
 
-            // Update User
-            $('#editUserForm').submit(function (e) {
-                e.preventDefault();
-                const userData = {
-                    id: $('#modalUserId').val(),
-                    name: $('#modalUserName').val(),
-                    email: $('#modalUserEmail').val(),
-                    dob: $('#modalUserDob').val(),
-                    status: $('#modalUserStatus').val(),
-                    users_id: $('#modalUsersId').val(),
+            serverSide: true,
+            ajax: {
+                url: "Student/birthdaycount",
+                type: "POST",
+                data: function(data) {
 
 
-                };
+                },
+            },
 
 
-                $.ajax({
-                    url: 'Student/update_user',
-                    method: 'POST',
-                    data: userData,
-                    success: function (output) {
-                        const res = JSON.parse(output);
-                        if (res.status === 'success') {
-                            toastr.success(res.message);
-                            $('#editUserModal').modal('hide');
-                            fetchUsers();
-                        } else {
-                            toastr.error(res.message);
-                        }
-                    },
-                    error: function () {
-                        toastr.error('Error updating user.');
-                    }
-                });
-            });
+            columns: [{
+                    data: "sn"
+                },
+                {
+                    data: "name"
+                },
+                {
+                    data: "email"
+                },
+                {
+                    data: "Category"
+                },
+                {
+                    data: "dob"
+                },
 
-
-
-            // Delete User
-            window.deleteUser = function (id) {
-                if (confirm('Are you sure you want to delete this user?')) {
-                    $.ajax({
-                        url: 'Student/delete_user',
-                        method: 'POST',
-                        data: {
-                            'id': id
-                        },
-                        success: function (output) {
-                            const res = JSON.parse(output);
-                            if (res.status === 'success') {
-                                toastr.success(res.message);
-                                fetchUsers();
-                            } else {
-                                toastr.error(res.message);
-                            }
-                        },
-                        error: function () {
-                            toastr.error('Error deleting user.');
-                        }
-                    });
-                }
-            };
-
-            // Load users on page load
-            fetchUsers();
+                {
+                    data: "upcoming_day_count"
+                },
+                {
+                    data: "days_until_birthday"
+                },
+                {
+                    data: "newDate"
+                },
+                {
+                    data: "status"
+                },
+                {
+                    data: "profile_pic"
+                },
+                {
+                    data: "action"
+                },
+            ]
         });
+
+
+    });
+
+    // // Open Add User Modal
+    $(document).on('click', '#openModalButton', function() {
+        $('#userModal').modal('show');
+
+        $('#users_id').select2({
+            dropdownParent: $('#userModal'),
+            tags: true,
+            allowClear: true,
+            width: '50%',
+            height: '34px',
+
+            ajax: {
+                url: 'http://localhost:8000/Student/usertype',
+                type: 'POST',
+                dataType: 'json',
+                delay: 250,
+                data: function(params) {
+                    return {
+                        searchTerm: params.term
+                    };
+                },
+                processResults: function(data) {
+                    return {
+                        results: data.map(function(usertype) {
+                            return {
+                                id: usertype.User_id,
+                                text: usertype.Category
+                            };
+                        })
+                    };
+                },
+                cache: true
+            },
+            minimumInputLength: 1,
+        });
+    });
+
+    // $('#userForm').submit(function(e) {
+    //     e.preventDefault();
+    //     $userData = {
+    //         name: $('#name').val(),
+    //         email: $('#email').val(),
+    //         dob: $('#dob').val(),
+    //         status: $('#status').val(),
+    //         users_id: $('#users_id').val(),
+    //         userfile: $('#userfile').val()
+    //     };
+    //     $.ajax({
+
+    //         url: 'Student/add_user',
+    //         method: 'POST',
+    //         data: $userData,
+    //         success: function(output) {
+    //             const res = JSON.parse(output);
+    //             if (res.status === 'success') {
+    //                 toastr.success(res.message);
+    //                 $('#userModal').modal('hide');
+    //                 $('#userForm')[0].reset();
+    //                 fetchUsers();
+    //             } else {
+    //                 toastr.error(res.message);
+    //             }
+    //         },
+    //         error: function() {
+    //             toastr.error(re.message);
+    //         }
+    //     });
+    // });
+
+    // // Edit User
+    $(document).on('click', '.editBtn', function() {
+
+        const id = $(this).data('id');
+        const name = $(this).data('name');
+        const email = $(this).data('email');
+        const dob = $(this).data('dob');
+        const status = $(this).data('status');
+        const users_id = $(this).data('category');
+        const user_id = $(this).data('users_id');
+        const profile_pic = $(this).data('profile_pic');
+
+
+        $('#modalUserId').val(id);
+        $('#modalUserName').val(name);
+        $('#modalUserEmail').val(email);
+        $('#modalUserDob').val(dob);
+        $('#currentProfilePic').val(profile_pic);
+
+        $('#currentProfilePic').attr('src', "<?php echo base_url('Images/'); ?>" + profile_pic);
+        $('#currentProfilePic').attr('alt', profile_pic);
+
+
+
+        const normalizedStatus = status.toLowerCase();
+
+
+        if ($('#modalUserStatus option[value="' + normalizedStatus + '"]').length) {
+            $('#modalUserStatus').val(normalizedStatus)
+                .change();
+        } else {
+            console.error('Status value not found in dropdown:', status);
+        }
+
+        $('#modalUsersId').val(users_id);
+
+        $('#editUserModal').modal('show');
+
+        const selectedOption = {
+
+            ids: user_id,
+            text: users_id,
+
+        };
+
+
+        if (selectedOption.ids) {
+            const option = new Option(selectedOption.text, selectedOption.ids, true, true);
+            selectElement.append(option).trigger('change');
+        }
+
+    });
+
+
+    const selectElement = $('.js-example-basic-category');
+    selectElement.select2({
+        dropdownParent: $('#editUserModal'),
+        placeholder: 'select an option',
+        width: '50%',
+        ajax: {
+            url: 'http://localhost:8000/Student/usertype',
+            type: 'POST',
+            dataType: 'json',
+            delay: 250,
+            data: function(params) {
+                return {
+                    searchTerm: params.term
+                };
+            },
+            processResults: function(data) {
+                return {
+                    results: data.map(function(usertype) {
+
+                        return {
+
+                            id: usertype.User_id,
+                            text: usertype.Category
+                        };
+                    })
+                };
+            },
+            cache: true
+        },
+        minimumInputLength: 1,
+    });
+
+
+
+
+
+    // Update User
+    // $('#editUserForm').submit(function(e) {
+    //     e.preventDefault(e);
+
+
+    //     const userData = {
+
+    //         id: $('#modalUserId').val(),
+    //         name: $('#modalUserName').val(),
+    //         email: $('#modalUserEmail').val(),
+    //         dob: $('#modalUserDob').val(),
+    //         status: $('#modalUserStatus').val(),
+    //         users_id: $('#modalUsersId').val(),
+    //         profile_pic: $('#changeimage').val(),
+
+    //     };
+    //     // console.log(userData);
+
+    //     $.ajax({
+    //         url: 'Student/update_user',
+    //         method: 'POST',
+    //         data: userData,
+    //         success: function(output) {
+    //             const res = JSON.parse(output);
+    //             if (res.status === 'success') {
+    //                 toastr.success(res.message);
+    //                 $('#editUserModal').modal('hide');
+
+    //             } else {
+    //                 toastr.error(res.message);
+    //             }
+    //         },
+    //         error: function() {
+    //             toastr.error('Error updating user.');
+    //         }
+    //     });
+    // });
+
+
+    // Delete User
+    window.deleteUser = function(id) {
+        if (confirm('Are you sure you want to delete this user?')) {
+            $.ajax({
+                url: 'Student/delete_user',
+                method: 'POST',
+                data: {
+                    'id': id
+                },
+                success: function(output) {
+                    const res = JSON.parse(output);
+                    if (res.status === 'success') {
+                        toastr.success(res.message);
+
+                    } else {
+                        toastr.error(res.message);
+                    }
+                },
+                error: function() {
+                    toastr.error('Error deleting user.');
+                }
+            });
+        }
+    };
+
+    document.getElementById('profile_pic').addEventListener('change', function(event) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var imagePreview = document.getElementById('image_preview');
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+        }
+        reader.readAsDataURL(event.target.files[0]);
+    });
     </script>
 </body>
 
