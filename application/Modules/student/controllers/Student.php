@@ -26,7 +26,7 @@
 				$Data = $query->result_array();
 
 
-
+				
 				$this->load->view('student', $Data);
 
 			}
@@ -63,8 +63,14 @@
 
 					];
 		
-					$this->student_model->store($data);
+					$flag = $this->student_model->store($data);
 
+					if($flag==True){
+					 $this->session->set_flashdata('success', 'Sucessful addeD User Data');
+				  }else
+				{
+					$this->session->set_flashdata('error', 'Something is wrong. Error!!');
+				}	
 					redirect('student');
 						
 			}
@@ -331,9 +337,9 @@
 		
 			$updated = $this->student_model->update_user($id,$data);
 
-			redirect('student');
+			
 
-			if ($updated) { // Respond back with success
+			if ($updated==True) { 
 				$output = array('status' => 'success', 'message' => 'User updated successfully!');
 			} else {
 			throw new Exception('Failed to update user.');
@@ -354,7 +360,8 @@
 
 		}
 
-		echo json_encode($output);
+		// echo json_encode($output);
+		redirect('student');
 		}
 
 
@@ -364,32 +371,32 @@
 		{
 
 		try {
-		$id = $this->input->post('id');
+			$id = $this->input->post('id');
 
-		// Delete from the database
+			$deleted = $this->student_model->delete_user($id);
+			
+		
+			if ($deleted) {
+				$output = array('status' => 'success', 'message' => 'User deleted successfully!');
+			} else 
+			{
+				throw new Exception('Failed to delete user.');
+			}
+			} catch (Exception $e) {
 
-		$deleted = $this->student_model->delete_user($id);
+			$output = $e->getMessage();
 
-		// Respond back with success
-		if ($deleted) {
-		$output = array('status' => 'success', 'message' => 'User deleted successfully!');
-		} else {
-		throw new Exception('Failed to delete user.');
-		}
-		} catch (Exception $e) {
-
-		$output = $e->getMessage();
-
-		}
-
+			}
 		echo json_encode($output);
-
-		}
+		redirect('student');
+		
+	
+	}
 
 
 		public function birthdaycount()
 		{
-		$users = $this->student_model->get_all_users(); // Ensure this returns valid data
+		$users = $this->student_model->get_all_users(); 
 
 		$result = [];
 		$count = 1;
@@ -444,6 +451,7 @@
 
 
 
+		
 		
 
 

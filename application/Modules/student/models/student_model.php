@@ -8,6 +8,7 @@ class student_model extends CI_Model
     {
         parent::__construct();
         $this->load->database();
+        $this->load->library('session');
         $this->load->library('upload');
 
     }
@@ -134,7 +135,16 @@ class student_model extends CI_Model
     public function store($data)
     {
         // Insert data into the users table
-        return $this->db->insert('users', $data);
+       $query= $this->db->insert('users', $data);
+       if($query){
+      
+        return true;
+      }
+      else{
+        
+        return false;
+      }
+
     }
 
     public function update_user($id, $data)
@@ -143,7 +153,13 @@ class student_model extends CI_Model
 
         // Update user details by ID
         $this->db->where('id', $id);
-        return $this->db->update('users', $data);
+        $query= $this->db->update('users', $data);
+
+        if($query){
+            return true;
+        }else{
+            return false;
+        }
     }
 
     public function delete_user($id)
@@ -164,6 +180,19 @@ class student_model extends CI_Model
 
          return  $curr_img['profile_pic'];     
     }
+
+    public function get_province(){
+
+        $this->db->select('p_name');
+        $this->db->from('provinces');
+        $query = $this->db->get();
+
+        $province_name= $query->result_array();
+
+        return $province_name;
+
+    }
+
 
 
 

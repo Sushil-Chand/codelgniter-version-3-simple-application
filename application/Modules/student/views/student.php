@@ -57,9 +57,23 @@
 <body class="bg-light">
     <div class="container mt-5">
         <h1 class="text-center text-primary mb-4">User Management</h1>
-        <?php if (isset($error)): ?>
-        <p style="color: red;"><?php echo $error; ?></p><?php endif; ?>
-        <?php echo validation_errors(); ?>
+        <?php if ($this->session->flashdata('success')) { ?>
+
+        <div class="alert alert-success">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+            <strong><?php echo $this->session->flashdata('success'); ?></strong>
+        </div>
+
+        <?php } ?>
+
+        <?php if ($this->session->flashdata('error')) { ?>
+
+        <div class="alert alert-danger">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">×</a>
+            <strong><?php echo $this->session->flashdata('error'); ?></strong>
+        </div>
+
+        <?php } ?>
 
 
         <!-- Add User Button -->
@@ -139,7 +153,7 @@
                                     </select>
                                 </div>
                                 <div class="col-md-4 d-flex align-items-end">
-                                    <button type="submit" class="btn btn-primary w-100">ADD</button>
+                                    <button type="submit" class="btn btn-primary w-100" value="upload">ADD</button>
                                 </div>
                             </div>
 
@@ -287,6 +301,7 @@
 
 
     <script>
+    var usersTable;
     $(document).ready(function() {
         //Fetch and display users
 
@@ -446,7 +461,7 @@
     //         dob: $('#dob').val(),
     //         status: $('#status').val(),
     //         users_id: $('#users_id').val(),
-    //         userfile: $('#userfile').val()
+    //         profile_pic: $('#profile_pic').val()
     //     };
     //     $.ajax({
 
@@ -599,7 +614,10 @@
     // });
 
 
-    // Delete User
+
+
+
+
     window.deleteUser = function(id) {
         if (confirm('Are you sure you want to delete this user?')) {
             $.ajax({
@@ -620,8 +638,11 @@
                 error: function() {
                     toastr.error('Error deleting user.');
                 }
+
             });
         }
+
+
     };
 
     document.getElementById('profile_pic').addEventListener('change', function(event) {
@@ -632,6 +653,11 @@
             imagePreview.style.display = 'block';
         }
         reader.readAsDataURL(event.target.files[0]);
+    });
+
+
+    window.addEventListener('load', function() {
+        toastr.success('<?php echo $this->session->flashdata('success'); ?>');
     });
     </script>
 </body>
